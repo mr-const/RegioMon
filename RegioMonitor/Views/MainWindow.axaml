@@ -42,13 +42,30 @@
             <ListBox ItemsSource="{Binding Trains}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal"
+                                    Name="Train"
+                                    Classes.found="{Binding Bookable}">
                             <CheckBox IsChecked="{Binding Bookable}"/>
-                            <TextBlock Text="{Binding DepartureTime}"/>
-                            <TextBlock Text="{Binding ArrivalTime}"/>
+                            <TextBlock Text="{Binding FreeSeatsCount}"
+                                       Classes.found="{Binding Bookable}"
+                                       Margin="10"/>
+                            <TextBlock Text="{Binding DepartureTime}"
+                                       Classes.found="{Binding Bookable}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding ArrivalTime}"
+                                       Classes.found="{Binding Bookable}"
+                                       VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.Styles>
+                    <Style Selector="StackPanel#Train.found">
+                        <Setter Property="Background" Value="Green"/>
+                    </Style>
+                    <Style Selector="TextBlock.found">
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </ListBox.Styles>
             </ListBox>
         </StackPanel>
         <StackPanel Grid.Row="2"
