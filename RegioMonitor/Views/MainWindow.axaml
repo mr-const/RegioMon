@@ -19,7 +19,7 @@
                 Orientation="Horizontal">
                 <Label Content="Date"/>
                 <DatePicker
-                    IsEnabled="{Binding !IsInstallRunning}"
+                    IsEnabled="{Binding !IsSearchRunning}"
                     SelectedDate="{Binding DepartureDate}"/>
             </StackPanel>
             <StackPanel
@@ -27,7 +27,7 @@
                 Orientation="Horizontal">
                 <Label Content="From"/>
                 <TextBox
-                    IsEnabled="{Binding !IsInstallRunning}"
+                    IsEnabled="{Binding !IsSearchRunning}"
                     Text="{Binding FromId}"
                     Width="200"/>
             </StackPanel>
@@ -35,7 +35,7 @@
                 Orientation="Horizontal">
                 <Label Content="To"/>
                 <TextBox
-                    IsEnabled="{Binding !IsInstallRunning}"
+                    IsEnabled="{Binding !IsSearchRunning}"
                     Text="{Binding ToId}"
                     Width="200"/>
             </StackPanel>
@@ -44,16 +44,16 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Name="Train"
-                                    Classes.found="{Binding Bookable}">
+                                    Classes.found="{Binding IsRequestedFound}">
                             <CheckBox IsChecked="{Binding Bookable}"/>
                             <TextBlock Text="{Binding FreeSeatsCount}"
-                                       Classes.found="{Binding Bookable}"
+                                       Classes.found="{Binding IsRequestedFound}"
                                        Margin="10"/>
                             <TextBlock Text="{Binding DepartureTime}"
-                                       Classes.found="{Binding Bookable}"
+                                       Classes.found="{Binding IsRequestedFound}"
                                        VerticalAlignment="Center"/>
                             <TextBlock Text="{Binding ArrivalTime}"
-                                       Classes.found="{Binding Bookable}"
+                                       Classes.found="{Binding IsRequestedFound}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
@@ -74,8 +74,8 @@
                     VerticalAlignment="Center">
             <Label Foreground="Red" Content="{Binding ErrorMessage}"/>
             <Button
-                IsEnabled="{Binding !IsInstallRunning}"
-                Content="Install"
+                IsEnabled="{Binding !IsSearchRunning}"
+                Content="Find"
                 Command="{Binding RequestTrainListCommand}"/>
         </StackPanel>
     </Grid>

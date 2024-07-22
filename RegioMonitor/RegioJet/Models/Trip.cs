@@ -27,6 +27,14 @@ namespace RegioMonitor.RegioJet.Models
         public object? Delay { get; set; } = null; // Could be null, consider using a specific type if known
         public string TravelTime { get; set; } = string.Empty;
         public List<string> VehicleStandards { get; set; } = new List<string>();
+
+        // extended property
+        public bool IsRequestedFound { get; private set; }
+
+        public void SetIsRequestedFound(bool value)
+        {
+            IsRequestedFound = value;
+        }
     }
 
     /*

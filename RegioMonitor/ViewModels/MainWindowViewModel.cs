@@ -33,7 +33,7 @@ public partial class MainWindowViewModel : ObservableObject
     private CancellationTokenSource? _cancelInstallTokenSource = new();
 
     [ObservableProperty]
-    public bool _isInstallRunning = false;
+    public bool _isSearchRunning = false;
 
     public IRelayCommand RequestTrainListCommand { get; init; }
 
@@ -54,7 +54,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         try
         {
-            var resp = await _rjApi.SimpleRouteSearch("2024-08-07", 5990055004, 10202003);
+            var resp = await _rjApi.SimpleRouteSearch(DepartureDate.ToString("yyyy-MM-dd"), 5990055004, 10202003);
             if (resp != null)
             {
                 _logger.LogInformation("Retrieved {Count} trains", resp.Routes.Length);
@@ -63,6 +63,7 @@ public partial class MainWindowViewModel : ObservableObject
                 Trains.Clear();
                 foreach (var trip in resp.Routes)
                 {
+                    trip.SetIsRequestedFound(trip.DepartureTime.Date == DepartureDate.Date && trip.Bookable);
                     Trains.Add(trip);
                 }
             }

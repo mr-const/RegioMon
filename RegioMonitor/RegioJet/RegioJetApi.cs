@@ -23,7 +23,7 @@ namespace RegioMon.RegioJet
         public async Task<RegioJetListResponse?> SimpleRouteSearch(string departureDate, long fromLocationId, long toLocationId)
         {
             // https://brn-ybus-pubapi.sa.cz/restapi/routes/search/simple?tariffs=REGULAR&toLocationType=CITY&toLocationId=10202003&fromLocationType=CITY&fromLocationId=5990055004&departureDate=2024-08-07&fromLocationName=&toLocationName=
-            string url = Endpoint + $"restapi/routes/search/simple?tariffs=REGULAR&toLocationType=CITY&fromLocationType=CITY&fromLocationName=&toLocationName=&toLocationId={toLocationId}&fromLocationId={fromLocationId}&departureDate=2024-08-07";
+            string url = Endpoint + $"restapi/routes/search/simple?tariffs=REGULAR&toLocationType=CITY&fromLocationType=CITY&fromLocationName=&toLocationName=&toLocationId={toLocationId}&fromLocationId={fromLocationId}&departureDate={departureDate}";
 
 
             _logger.LogInformation("Requesting train list on {Date}", departureDate);
