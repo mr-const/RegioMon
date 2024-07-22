@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RegioMon.ViewModels"
+        xmlns:br="using:RegioMon"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="RegioMon.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
+        br:ViewModelLocator.AutoWireViewModel="True"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="RegioMon">
+
+    <Grid RowDefinitions="auto, auto, *">
+        <TextBlock Grid.Row="0" Text="Welcome to Regiojet Monitor" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <StackPanel
+                Orientation="Horizontal">
+                <Label Content="Date"/>
+                <DatePicker
+                    IsEnabled="{Binding !IsInstallRunning}"
+                    SelectedDate="{Binding DepartureDate}"/>
+            </StackPanel>
+            <StackPanel
+                IsVisible="True"
+                Orientation="Horizontal">
+                <Label Content="From"/>
+                <TextBox
+                    IsEnabled="{Binding !IsInstallRunning}"
+                    Text="{Binding FromId}"
+                    Width="200"/>
+            </StackPanel>
+            <StackPanel
+                Orientation="Horizontal">
+                <Label Content="To"/>
+                <TextBox
+                    IsEnabled="{Binding !IsInstallRunning}"
+                    Text="{Binding ToId}"
+                    Width="200"/>
+            </StackPanel>
+            <ListBox ItemsSource="{Binding Trains}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Bookable}"/>
+                            <TextBlock Text="{Binding DepartureTime}"/>
+                            <TextBlock Text="{Binding ArrivalTime}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <Label Foreground="Red" Content="{Binding ErrorMessage}"/>
+            <Button
+                IsEnabled="{Binding !IsInstallRunning}"
+                Content="Install"
+                Command="{Binding RequestTrainListCommand}"/>
+        </StackPanel>
+    </Grid>
+
+
+</Window>
