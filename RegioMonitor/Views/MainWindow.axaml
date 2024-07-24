@@ -74,9 +74,19 @@
                     VerticalAlignment="Center">
             <Label Foreground="Red" Content="{Binding ErrorMessage}"/>
             <Button
-                IsEnabled="{Binding !IsSearchRunning}"
-                Content="Find"
-                Command="{Binding RequestTrainListCommand}"/>
+                Classes.searching="{Binding IsSearchRunning}"
+                Classes.idle="{Binding !IsSearchRunning}">
+                <Button.Styles>
+                    <Style Selector="Button.searching">
+                        <Setter Property="Content" Value="Stop"/>
+                        <Setter Property="Command" Value="{Binding CancelMonitoringCommand}"/>
+                    </Style>
+                    <Style Selector="Button.idle">
+                        <Setter Property="Content" Value="Find"/>
+                        <Setter Property="Command" Value="{Binding BeginMonitoringCommand}"/>
+                    </Style>
+                </Button.Styles>
+            </Button>
         </StackPanel>
     </Grid>
 
