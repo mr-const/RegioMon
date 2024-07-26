@@ -2,6 +2,10 @@
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +17,7 @@ namespace RegioMon.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    const int RequestTimeout = 5000;
+    const int RequestTimeout = 15000;
 
     [ObservableProperty]
     public DateTimeOffset _departureDate;
@@ -74,8 +78,25 @@ public partial class MainWindowViewModel : ObservableObject
                         Trains.Clear();
                         foreach (var trip in resp.Routes)
                         {
-                            trip.SetIsRequestedFound(trip.DepartureTime.Date == DepartureDate.Date && trip.Bookable);
+                            bool found = trip.DepartureTime.Date == DepartureDate.Date && trip.Bookable;
+                            trip.SetIsRequestedFound(found);
                             Trains.Add(trip);
+
+                            if (found)
+                            {
+                                _logger.LogInformation("Have train: {Train} with {FreeSeats} seats", trip.DepartureTime, trip.FreeSeatsCount);
+                                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                                {
+                                    if (desktop.MainWindow != null)
+                                    {
+                                        Dispatcher.UIThread.Invoke(() =>
+                                        {
+                                            desktop.MainWindow.Show();
+                                            desktop.MainWindow.WindowState = WindowState.Normal;
+                                        });
+                                    }
+                                }
+                            }
                         }
                     }
                 }
