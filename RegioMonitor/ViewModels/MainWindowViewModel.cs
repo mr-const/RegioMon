@@ -72,7 +72,7 @@ public partial class MainWindowViewModel : ObservableObject
                     var resp = await _rjApi.SimpleRouteSearch(DepartureDate.ToString("yyyy-MM-dd"), 5990055004, 10202003);
                     if (resp != null)
                     {
-                        _logger.LogInformation("Retrieved {Count} trains", resp.Routes.Length);
+                        _logger.LogDebug("Retrieved {Count} trains", resp.Routes.Length);
                         ErrorMessage = string.Empty;
 
                         Trains.Clear();

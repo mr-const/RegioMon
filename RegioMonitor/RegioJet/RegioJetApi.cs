@@ -26,7 +26,7 @@ namespace RegioMon.RegioJet
             string url = Endpoint + $"restapi/routes/search/simple?tariffs=REGULAR&toLocationType=CITY&fromLocationType=CITY&fromLocationName=&toLocationName=&toLocationId={toLocationId}&fromLocationId={fromLocationId}&departureDate={departureDate}";
 
 
-            _logger.LogInformation("Requesting train list on {Date}", departureDate);
+            _logger.LogDebug("Requesting train list on {Date}", departureDate);
             var response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
