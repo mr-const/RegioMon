@@ -57,7 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
         BeginMonitoringCommand = new RelayCommand(StartMonitoring);
         CancelMonitoringCommand = new RelayCommand(StopMonitoring);
 
-        DepartureDate = new DateTime(2024, 8, 7);
+        DepartureDate = new DateTime(2025, 7, 5);
     }
 
     private async Task RequestTrainList(CancellationToken ct)
@@ -69,7 +69,10 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 try
                 {
-                    var resp = await _rjApi.SimpleRouteSearch(DepartureDate.ToString("yyyy-MM-dd"), 5990055004, 10202003);
+                    // Kyiv - 271526028
+                    // Przemysl - 5990055004
+                    // Praha - 10202003
+                    var resp = await _rjApi.SimpleRouteSearch(DepartureDate.ToString("yyyy-MM-dd"), 10202003, 5990055004);
                     if (resp != null)
                     {
                         _logger.LogDebug("Retrieved {Count} trains", resp.Routes.Length);
@@ -78,24 +81,59 @@ public partial class MainWindowViewModel : ObservableObject
                         Trains.Clear();
                         foreach (var trip in resp.Routes)
                         {
-                            bool found = trip.DepartureTime.Date == DepartureDate.Date && trip.Bookable;
+                            bool found = (trip.DepartureTime.Date == DepartureDate.Date
+                                          || trip.DepartureTime.Date == DepartureDate.Date.AddDays(1)
+                                          || trip.DepartureTime.Date == DepartureDate.Date.AddDays(2)
+                                          )
+                                         && trip.Bookable;
                             trip.SetIsRequestedFound(found);
                             Trains.Add(trip);
 
                             if (found)
                             {
-                                _logger.LogInformation("Have train: {Train} with {FreeSeats} seats", trip.DepartureTime, trip.FreeSeatsCount);
-                                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                                _logger.LogInformation("Have train: {TrainId} {Departure} with {FreeSeats} seats", trip.Id, trip.DepartureTime, trip.FreeSeatsCount);
+
+                                // retrieve details for the trip
+                                RegioJetRouteDetailResponse? details = await _rjApi.GetRouteDetails(trip.Id, trip.DepartureStationId, trip.ArrivalStationId);
+                                if (details != null)
                                 {
-                                    if (desktop.MainWindow != null)
+                                    foreach(var section in details.Sections)
                                     {
-                                        Dispatcher.UIThread.Invoke(() =>
+                                        _logger.LogDebug("Section {SectionId} has {FreeSeats} free seats", section.Id, section.FreeSeatsCount);
+                                        // retrieve free seats for the section
+                                        var seatsResponse = await _rjApi.GetFreeSeats(section.Id, trip.DepartureStationId, trip.ArrivalStationId, "TRAIN_COUCHETTE_RELAX");
+                                        if (seatsResponse != null && seatsResponse.Length > 0)
                                         {
-                                            desktop.MainWindow.Show();
-                                            desktop.MainWindow.WindowState = WindowState.Normal;
-                                        });
+                                            _logger.LogInformation("Section {SectionId} has {Count} vehicles", section.Id, seatsResponse[0].Vehicles);
+                                            // retrieve indices of free seats for each vehicle
+                                            // seatsResponse[0].Vehicles[i].Decks[0].FreeSeats[j].Index
+                                            foreach (var vehicle in seatsResponse[0].Vehicles)
+                                            {
+                                                _logger.LogDebug("Vehicle {VehicleId} has {DecksCount} decks", vehicle.Id, vehicle.Decks.Count);
+                                                foreach (var deck in vehicle.Decks)
+                                                {
+                                                    _logger.LogInformation("Deck {DeckName} has {FreeSeatsCount} free seats", deck.Name, deck.FreeSeats.Count);
+                                                    foreach (var freeSeat in deck.FreeSeats)
+                                                    {
+                                                        _logger.LogInformation("Free seat index: {Index}", freeSeat.Index);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+
+                                //if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                                //{
+                                //    if (desktop.MainWindow != null)
+                                //    {
+                                //        Dispatcher.UIThread.Invoke(() =>
+                                //        {
+                                //            desktop.MainWindow.Show();
+                                //            desktop.MainWindow.WindowState = WindowState.Normal;
+                                //        });
+                                //    }
+                                //}
                             }
                         }
                     }
